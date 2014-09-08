@@ -103,18 +103,38 @@ describe('q-flow', function() {
       return results.should.eventually.be.rejectedWith(Error, "an error");
     });
 
+    it('should pass on the error with a returned promise', function() {
+      var results = flow({
+        one: function() {
+          return q.fcall(function() {
+            throw Error("an error");
+          });
+        }
+      })
+
+      return results.should.eventually.be.rejectedWith(Error, "an error");
+    });
+
     it('should pass on an error with a complex flow', function() {
       var results = flow({
         one: 1,
         two: function(one) {
           throw Error("error with value: " + (one + 1));
-        },
-        three: function(one) {
-          return one + 2;
         }
       });
 
       return results.should.eventually.be.rejectedWith(Error, "error with value: 2");
+    });
+
+    it('should pass a nice error for missing deps', function() {
+      var results = flow({
+        one: 1,
+        two: function(one, a) {
+          return one + 1;
+        }
+      });
+
+      return results.should.eventually.be.rejectedWith(Error, "Unkown dependency a for key: two");
     });
   });
 })

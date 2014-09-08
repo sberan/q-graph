@@ -1,11 +1,12 @@
 var q = require('q'),
     _ = require('underscore'),
-    getParameterNames = require('get-parameter-names');
+    getParameterNames = require('get-parameter-names'),
+    util = require('util');
 
 module.exports = function(flowSpec) {
   var entries = {}; 
   var results = {};
-  var promises = []
+  var promises = [];
 
   Object.keys(flowSpec).forEach(function (key) { 
     var deferred = q.defer();
@@ -29,11 +30,18 @@ module.exports = function(flowSpec) {
 
     //a function
     var deps = getParameterNames(entry.val)
-    var depPromises = deps.map(function(depName) { return entries[depName].promise })
+    var unknownDeps = _.difference(deps, Object.keys(flowSpec));
+    if (unknownDeps.length) {
+      entry.deferred.reject(new Error(util.format("Unkown %s %s for key: %s", unknownDeps.length == 1? 'dependency': 'dependencies', unknownDeps, key)));
+      return;
+    }
+
+    var depPromises = deps.map(function(depName) { return entries[depName] && entries[depName].promise })
+    
     q.all(depPromises).then(function(depResults) {
       q.fapply(entry.val, depResults).then(function(result) {
         entry.deferred.resolve(result);
-      }).catch(entry.deferred.reject);
+      }).catch(entry.deferred.reject)
     });
   });
 
