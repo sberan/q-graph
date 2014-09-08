@@ -1,35 +1,44 @@
 
 # q-flow
 
-### A utility to describe promise workflows as a dependency graph
+### Dependency injected promise workflows
 
-Pass an object to describe workflows of promises. Entries in the object
-may be used by other entries, and results are passed into other entries that depend
-on them.
+A flow is a set of computations. Entries in the set can depend on each other,
+using function parameter names to bind to the result of other entries.
 
-### A Simple Example
+Entry values can be a simple value, a promise, or a function. A function will be invoked once all it's dependencies
+are finished, and can return either a simple value, or a promise.
 
+### Example Flow
+
+```javascript
     var flow = require('q-flow');
 
     flow({
-      one: 1,
-      two: function(one) {
-        return one + 1;
+      stepOne: function() {
+        return q(1); // returning a promise. This could be a database or web service call.
       },
-      three: function(one, two) {
-        return one + two;
+      stepTwo: function(stepOne) {
+        // will be called with the result computed by stepOne
+        return stepOne + 1;
       },
-    }).then(console.log); //prints {one: 1, two: 2, three: 3}
+      stepThree: function(stepOne, stepTwo) {
+        // depends on the two previous computations
+        return stepOne + stepTwo;
+      },
+    }).then(console.log); //prints {stepOne: 1, stepTwo: 2, stepThree: 3}
+```
 
 ### Special entries:
 
-#### `_catch` entries:
+#### _catch
 
-`_catch` entries will be invoked when the flow encounters an error. This is syntactic sugar for flow({ ... }).catch( ... );
+`_catch` entries will be invoked when the flow encounters an error. This is syntactic sugar for `flow({ ... }).catch( ... );`
 
 
 *Example*
 
+```javascript
     flow({
       step: function() {
         throw Error("oops");
@@ -38,13 +47,15 @@ on them.
         return "it's all good"
       }
     }).then(console.log); //prints "it's all good"
+```
 
-#### `_then` entries
+#### _then
 
 `_then` entries modify the result of the flow. Instead of a map of all results, the result of the `_then` entry is returned.
 
 *Example*
 
+```javascript
     flow({
       one: 1,
       two: function(one) {
@@ -54,4 +65,5 @@ on them.
         return one + two
       }
     }).then(console.log); //prints 3
+```
 
