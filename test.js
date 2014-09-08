@@ -190,6 +190,61 @@ describe('q-flow', function() {
       return results.should.eventually.be.rejectedWith(Error, 'error in catch')
     });
 
+    it('should allow a _then entry to set the result', function() {
+      var results = flow({
+        one: 1,
+        two: function(one) {
+          return one + 1;
+        },
+        _then: function(one, two) {
+          return 3;
+        }
+      });
+
+      return results.should.eventually.eql(3);
+    });
+
+    it('should allow a promise to be returned via _then entry', function() {
+      var results = flow({
+        one: 1,
+        two: function(one) {
+          return one + 1;
+        },
+        _then: function(one, two) {
+          return q.fcall(function() { return 3 });
+        }
+      });
+
+      return results.should.eventually.eql(3);
+    });
+
+    it('should allow a static _then entry', function() {
+      var results = flow({
+        one: 1,
+        two: function(one) {
+          return one + 1;
+        },
+        _then: 3
+      });
+
+      return results.should.eventually.eql(3);
+    });
+
+    it('should re-throw errors thrown in the _then entry', function() {
+      var results = flow({
+        one: 1,
+        two: function(one) {
+          return one + 1;
+        },
+        _then: function(one, two) {
+          throw Error('error in _then');
+        }
+      });
+
+      return results.should.eventually.be.rejectedWith(Error, 'error in _then');
+    });
+
+
   });
 
 })

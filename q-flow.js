@@ -64,5 +64,11 @@ module.exports = function(flowSpec) {
     }
   }
 
+  if(entries['_then']) {
+    result = result.then(function() {
+      return results['_then'];
+    });
+  }
+
   return result;
 }
