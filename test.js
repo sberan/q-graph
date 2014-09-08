@@ -137,4 +137,59 @@ describe('q-flow', function() {
       return results.should.eventually.be.rejectedWith(Error, "Unkown dependency a for key: two");
     });
   });
+
+  describe('special keys', function() {
+
+    it('should allow a _catch entry to catch errors', function() {
+      var results = flow({
+        a: function () {
+          throw Error("an error");
+        },
+        _catch: function(err) {
+          return 42;
+        }
+      });
+
+      return results.should.eventually.eql(42)
+    });
+
+    it('should allow a promise to be returned via _catch entry', function() {
+      var results = flow({
+        a: function () {
+          throw Error("an error");
+        },
+        _catch: function(err) {
+          return q.fcall(function() { return 22; });
+        }
+      });
+
+      return results.should.eventually.eql(22)
+    });
+
+    it('should allow a static _catch entry', function() {
+      var results = flow({
+        a: function () {
+          throw Error("an error");
+        },
+        _catch: 22
+      });
+
+      return results.should.eventually.eql(22)
+    });
+
+    it('should re-throw errors thrown in a catch entry', function() {
+      var results = flow({
+        a: function () {
+          throw Error("an error");
+        },
+        _catch: function(err) {
+          throw Error('error in catch');
+        }
+      });
+
+      return results.should.eventually.be.rejectedWith(Error, 'error in catch')
+    });
+
+  });
+
 })
