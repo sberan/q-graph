@@ -39,7 +39,11 @@ module.exports = function(flowSpec) {
       return;
     }
 
-    var depPromises = deps.map(function(depName) { return entries[depName] && entries[depName].promise })
+    var depPromises = deps.map(function(depName) { return entries[depName].promise })
+    if (key == '_then') {
+      // wait for all other promises to resolve first
+      depPromises = q.all(_.pluck(_.omit(entries, '_then'), 'promise')).then(q.all(depPromises))
+    }
     
     q.all(depPromises).then(function(depResults) {
       q.fapply(entry.val, depResults).then(function(result) {

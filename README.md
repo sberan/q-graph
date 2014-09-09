@@ -51,7 +51,7 @@ are finished, and can return either a simple value, or a promise.
 
 #### _then
 
-`_then` entries modify the result of the flow. Instead of a map of all results, the result of the `_then` entry is returned.
+`_then` entries wait for all other entries to run, and modify the result of the flow. Instead of a map of all results, the result of the `_then` entry is returned.
 
 *Example*
 

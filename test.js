@@ -244,6 +244,23 @@ describe('q-flow', function() {
       return results.should.eventually.be.rejectedWith(Error, 'error in _then');
     });
 
+    it('should only run _then entries after everything has finished', function() {
+      var state = 'not run';
+
+      var results = flow({
+        wait: function () {
+          var deferred = q.defer();
+          setTimeout(function() {
+            state = 'run';
+            deferred.resolve();
+          }, 10);
+          return deferred.promise;
+        },
+        _then: function() { return state; }
+      });
+
+      return results.should.eventually.eql('run');
+    });
 
   });
 
