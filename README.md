@@ -9,6 +9,8 @@ using function parameter names to bind to the result of other entries.
 Entry values can be a simple value, a promise, or a function. A function will be invoked once all it's dependencies
 are finished, and can return either a simple value, or a promise.
 
+Entries will be run concurrently, as long as all their dependencies are fulfilled.
+
 ### Example Flow
 
 ```javascript
