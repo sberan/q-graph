@@ -1,6 +1,6 @@
 {
   "name": "q-flow",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "q-flow.js",
   "scripts": {
@@ -8,6 +8,9 @@
   },
   "author": "Sam Beran",
   "license": "ISC",
+  "keywords": ["q", "promise", "workflow"],
+  "homepage": "https://github.com/sberan/q-flow",
+  "repository": "https://github.com/sberan/q-flow.git",
   "devDependencies": {
     "chai": "^1.9.1",
     "chai-as-promised": "^4.1.1",
