@@ -1,16 +1,16 @@
 {
-  "name": "q-flow",
+  "name": "q-graph",
   "version": "0.0.1",
   "description": "",
-  "main": "q-flow.js",
+  "main": "q-graph.js",
   "scripts": {
     "test": "mocha test.js"
   },
   "author": "Sam Beran",
   "license": "ISC",
   "keywords": ["q", "promise", "workflow"],
-  "homepage": "https://github.com/sberan/q-flow",
-  "repository": "https://github.com/sberan/q-flow.git",
+  "homepage": "https://github.com/sberan/q-graph",
+  "repository": "https://github.com/sberan/q-graph.git",
   "devDependencies": {
     "chai": "^1.9.1",
     "chai-as-promised": "^4.1.1",

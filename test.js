@@ -1,15 +1,15 @@
-var flow = require('./q-flow.js'),
+var graph = require('./q-graph.js'),
     q = require('q'),
     chai = require('chai');
 
 chai.use(require('chai-as-promised')).should()
 
-describe('q-flow', function() {
+describe('q-graph', function() {
 
   describe('resolving values', function() {
 
     it('should return a static value', function() {
-      var results = flow({
+      var results = graph({
         one: 1
       })
       
@@ -17,7 +17,7 @@ describe('q-flow', function() {
     });
 
     it('should resolve a computed value', function() {
-      var results = flow({
+      var results = graph({
         one: function() {
           return 1;
         }
@@ -27,7 +27,7 @@ describe('q-flow', function() {
     });
 
     it('should resolve a raw promise', function() {
-      var results = flow({
+      var results = graph({
         twoPromise: q.fcall(function() { return 2 })
       })
       
@@ -35,7 +35,7 @@ describe('q-flow', function() {
     });
 
     it('should resolve a promise', function() {
-      var results = flow({
+      var results = graph({
         two: function() {
           return q.fcall(function() { return 2 });
         }
@@ -45,7 +45,7 @@ describe('q-flow', function() {
     });
 
     it('should resolve multiple values', function() {
-      var results = flow({
+      var results = graph({
         one: function() { return 1 },
         two: function() {
           return 2
@@ -56,7 +56,7 @@ describe('q-flow', function() {
     });
 
     it('should resolve a dependent value', function() {
-      var results = flow({
+      var results = graph({
         one: function() { return 1 },
         two: function(one) {
           return 1 + one; 
@@ -67,7 +67,7 @@ describe('q-flow', function() {
     });
 
     it('should resolve multiple dependent values', function() {
-      var results = flow({
+      var results = graph({
         one: function() { return 1 },
         two: function(one) {
           return 1 + one; 
@@ -84,7 +84,7 @@ describe('q-flow', function() {
   describe('error handling', function() {
 
     it('should pass on the error', function() {
-      var results = flow({
+      var results = graph({
         one: function() {
            throw Error("an error");
         }
@@ -94,7 +94,7 @@ describe('q-flow', function() {
     });
 
     it('should pass on the error with a raw promise', function() {
-      var results = flow({
+      var results = graph({
         one: q.fcall(function() {
            throw Error("an error");
         })
@@ -104,7 +104,7 @@ describe('q-flow', function() {
     });
 
     it('should pass on the error with a returned promise', function() {
-      var results = flow({
+      var results = graph({
         one: function() {
           return q.fcall(function() {
             throw Error("an error");
@@ -115,8 +115,8 @@ describe('q-flow', function() {
       return results.should.eventually.be.rejectedWith(Error, "an error");
     });
 
-    it('should pass on an error with a complex flow', function() {
-      var results = flow({
+    it('should pass on an error with a complex graph', function() {
+      var results = graph({
         one: 1,
         two: function(one) {
           throw Error("error with value: " + (one + 1));
@@ -127,7 +127,7 @@ describe('q-flow', function() {
     });
 
     it('should pass a nice error for missing deps', function() {
-      var results = flow({
+      var results = graph({
         one: 1,
         two: function(one, a) {
           return one + 1;
@@ -141,7 +141,7 @@ describe('q-flow', function() {
   describe('special keys', function() {
 
     it('should allow a _catch entry to catch errors', function() {
-      var results = flow({
+      var results = graph({
         a: function () {
           throw Error("an error");
         },
@@ -154,7 +154,7 @@ describe('q-flow', function() {
     });
 
     it('should allow a promise to be returned via _catch entry', function() {
-      var results = flow({
+      var results = graph({
         a: function () {
           throw Error("an error");
         },
@@ -167,7 +167,7 @@ describe('q-flow', function() {
     });
 
     it('should allow a static _catch entry', function() {
-      var results = flow({
+      var results = graph({
         a: function () {
           throw Error("an error");
         },
@@ -178,7 +178,7 @@ describe('q-flow', function() {
     });
 
     it('should re-throw errors thrown in a catch entry', function() {
-      var results = flow({
+      var results = graph({
         a: function () {
           throw Error("an error");
         },
@@ -191,7 +191,7 @@ describe('q-flow', function() {
     });
 
     it('should allow a _then entry to set the result', function() {
-      var results = flow({
+      var results = graph({
         one: 1,
         two: function(one) {
           return one + 1;
@@ -205,7 +205,7 @@ describe('q-flow', function() {
     });
 
     it('should allow a promise to be returned via _then entry', function() {
-      var results = flow({
+      var results = graph({
         one: 1,
         two: function(one) {
           return one + 1;
@@ -219,7 +219,7 @@ describe('q-flow', function() {
     });
 
     it('should allow a static _then entry', function() {
-      var results = flow({
+      var results = graph({
         one: 1,
         two: function(one) {
           return one + 1;
@@ -231,7 +231,7 @@ describe('q-flow', function() {
     });
 
     it('should re-throw errors thrown in the _then entry', function() {
-      var results = flow({
+      var results = graph({
         one: 1,
         two: function(one) {
           return one + 1;
@@ -247,7 +247,7 @@ describe('q-flow', function() {
     it('should only run _then entries after everything has finished', function() {
       var state = 'not run';
 
-      var results = flow({
+      var results = graph({
         wait: function () {
           var deferred = q.defer();
           setTimeout(function() {
